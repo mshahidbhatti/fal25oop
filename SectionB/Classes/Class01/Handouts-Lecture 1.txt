@@ -1,0 +1,209 @@
+Object-Oriented Programming (OOP) — Lecture 1 Handout
+
+Instructor: Muhammad Shahid Bhatti
+Course: Object-Oriented Programming (OOP)
+Date: 01-09-2025
+Repository: fal25oop (Sections A and B)
+
+Purpose of this handout
+
+This document summarizes what we covered in Lecture 1 and sets expectations for the course. It also lists the technology stack and workflow we will use during the semester. Place this file in your Lecture 1 folder for quick reference.
+
+1) Course Description
+
+This course introduces the principles and practices of Object-Oriented Programming (OOP). You will learn how to analyze problems, design modular solutions using classes and objects, and implement those solutions in Java. We focus on abstraction, encapsulation, inheritance, polymorphism, and composition. You will also learn the foundations of testing, version control, and basic tooling that supports professional software development.
+
+By the end of the course, you should be able to:
+
+Model real-world or domain-specific concepts as objects with clear responsibilities.
+
+Design class APIs that are cohesive and encapsulated.
+
+Apply inheritance and (preferably) composition to reuse behavior safely.
+
+Use polymorphism and interfaces to write extensible code.
+
+Write unit tests and reason about correctness.
+
+Work productively with modern tooling (Git, build tools, IDEs).
+
+2) Course Documents (CDF & Syllabus)
+
+CDF (Course Description File): Provided separately. Contains CLOs, mapping to program outcomes, assessment weights, and schedule.
+
+Syllabus: Provided separately. Covers policies, grading breakdown, important dates, academic integrity, and communication channels.
+
+Where to find them: In the LMS/repository (Lecture 1 folder or repo root), e.g., CDF.pdf, Syllabus.pdf.
+
+3) Why Object-Oriented Programming (vs. Procedural) — Theoretical Perspective
+
+Both paradigms are valuable. Procedural programming organizes code around procedures (functions) that operate on data; OOP organizes code around objects that own their state and behavior. We emphasize OOP here for the following theoretical reasons:
+
+A. Abstraction and Modeling
+OOP encourages modeling problem-domain concepts as types (classes) with identities, state, and behavior. This aligns code structure with mental/domain models (e.g., Student, Course, Enrollment).
+
+B. Encapsulation and Information Hiding
+Objects hide representation details and expose a stable public interface. This improves maintainability: you can change internals without breaking clients that rely on the public API (Liskov Substitution supports substitutability).
+
+C. Modularity and Composability
+Classes and packages provide natural modular boundaries. Composition (HAS-A) enables building complex behavior from simpler parts while minimizing coupling.
+
+D. Reuse and Extensibility
+Inheritance and polymorphism enable code reuse and behavior variation. Prefer composition for flexibility; use inheritance when true “is-a” relationships exist and the LSP holds.
+
+E. Evolution and Maintainability
+Well-encapsulated designs localize change. Interfaces and abstractions allow systems to grow without widespread rewrites (Open–Closed Principle).
+
+F. Testability
+Designing around interfaces and small, cohesive classes makes unit testing straightforward (dependency injection, mocking, etc.).
+
+Trade-offs / Caveats:
+
+OOP can add indirection and a learning curve (types, hierarchies, object lifecycles).
+
+Poor hierarchies are brittle; prefer interfaces and composition.
+
+Data-oriented or high-performance tasks may be simpler procedurally or with functional patterns (which Java also supports).
+
+4) Why Java for This Course
+
+Conceptual Fit: Strongly typed, OO-first language with explicit classes/interfaces—good for teaching OOP fundamentals.
+
+Ecosystem & Tooling: Mature IDEs (IntelliJ, VS Code), build tools (Gradle/Maven), testing (JUnit 5),  rich libraries (Collections, Streams).
+
+Platform Independence: JVM (“write once, run anywhere”).
+
+Safety & Clarity: GC, strong typing, readable syntax.
+
+Industry Relevance: Enterprise, Android (via Kotlin/Java), big data, backend.
+
+Balanced Paradigms: Modern Java supports OOP and functional style (lambdas/streams).
+
+Note: C++, Python, C# are also excellent. We choose Java for its pedagogy, tooling, and relevance balance.
+
+5) Classes and Objects — Theoretical Landscape
+
+Core concepts
+
+Object: Identity, state, behavior.
+
+Class: Blueprint/type defining structure & behavior.
+
+Interface (contract): Behavior without implementation; enables polymorphism and dependency inversion.
+
+Abstract class: Partial implementation + contract; useful when sharing state/behavior.
+
+Members: Fields (state), methods (behavior), constructors (initialization).
+
+Relationships
+
+Association: “uses” relationship.
+
+Aggregation: Whole–part with independent lifetimes (weak ownership).
+
+Composition: Whole–part with aligned lifetimes (strong ownership). Prefer composition to reduce coupling.
+
+Inheritance (IS-A): Subtype extends supertype; use sparingly and only when LSP holds.
+
+Polymorphism: Treat different concrete types uniformly via a shared abstraction; achieved via overriding/dynamic dispatch.
+
+Design qualities & principles
+
+Encapsulation & information hiding
+
+High cohesion, low coupling
+
+SOLID: SRP, OCP, LSP, ISP, DIP
+
+Law of Demeter (“talk to friends, not strangers”)
+
+DRY, YAGNI
+
+Java-specific notes (preview)
+
+Primitives vs reference types; String immutability
+
+Access modifiers: public, protected, package-private, private
+
+Packages/modules
+
+Constructors; overloading vs overriding
+
+equals/hashCode/toString contracts
+
+Generics & type erasure
+
+Exceptions (checked vs unchecked); try-with-resources
+
+Collections & Streams
+
+Concurrency basics (later)
+
+Testing with JUnit 5; Arrange–Act–Assert
+
+6) Technology Stack for This Course
+
+Runtime/Language
+
+JDK (LTS recommended, e.g., Java 21 LTS)
+
+Editor/IDE (choose one)
+
+IntelliJ IDEA (Community)
+
+VS Code + “Extension Pack for Java”
+
+Build & Dependencies
+
+Gradle (preferred) or Maven
+
+Markdown
+
+PlantUML or simple UML diagrams
+
+Optional
+
+GitHub Actions (CI)
+
+Code formatting: Google Java Format or IDE formatter
+
+7) Course Workflow (How We Operate)
+
+Local setup
+
+Install JDK, IDE, Git
+
+Clone the repo
+
+Keep folders organized (Sections A/B, Weeks, Classes, Labs)
+
+Typical loop
+
+git pull
+
+git checkout -b feat/week-01 (or switch to existing)
+
+Implement code & tests
+
+Run locally
+
+Java CLI: javac … && java …
+
+
+Discuss ideas but write your own code; cite sources
+
+
+8) After Lecture 1 — To-Dos
+
+Verify your environment (JDK, IDE, Git)
+
+Read the Syllabus and CDF
+
+Explore the repository structure & README
+
+Complete onboarding (warm-up exercise in Week 01)
+
+9) References (getting started)
+
+Official Java Tutorials & API docs
+
