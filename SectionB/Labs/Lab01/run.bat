@@ -1,0 +1,1 @@
+javac -d out MediaPlayer.java MediaPlayerTest.java

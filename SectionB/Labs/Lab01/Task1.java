@@ -1,3 +1,6 @@
+
+// Rectangle rect1 = new Rectangle();
+
 public class Task1{
 
 	public static void main(String a[]){
