@@ -1,0 +1,7 @@
+
+javac -d out src\Employee.java
+
+javac -cp out Test.java
+
+java -cp out;. Test
+
