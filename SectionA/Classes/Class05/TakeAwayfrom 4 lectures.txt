@@ -1,0 +1,52 @@
+Takeaways from CSC241 (Lectures 1–4, Labs 1–4)
+Concepts Learned
+
+Object-Oriented Programming (OOP) basics: Understanding the difference between class (blueprint) and object (instance).
+
+Real-world mapping: How everyday entities (e.g., Bank Account, Date, Rectangle, Circle) can be modeled as classes.
+
+Access Modifiers: Use of public and private to control data access.
+
+Encapsulation: Hiding data with private and accessing through setters/getters.
+
+Constructors:
+
+Default constructor (initializes with default values).
+
+Parameterized constructor (allows initialization with given values).
+
+Role of this keyword.
+
+Local variables vs. instance variables.
+
+Basic UML diagrams: Representing attributes and methods visually.
+
+Compilation & execution: javac (compile) and java (run), working with multiple files.
+
+Hands-on Practice in Labs
+
+Writing first Java program (Hello World).
+
+Working with primitive data types (int, double, boolean, etc.) and System.out.print/printf.
+
+Defining simple classes (BankAccount, Date, Rectangle, Circle).
+
+Implementing methods: deposit, withdraw, display, setTitle, etc.
+
+Testing classes with a driver/test class (DateTest, Demo).
+
+Observing behavior of == operator with objects (reference comparison).
+
+Understanding error cases (e.g., invalid inputs, negative deposits).
+
+Key Takeaways
+
+A class is a blueprint, and an object is a real instance created from it.
+
+Encapsulation ensures data security and integrity.
+
+Constructors make object creation flexible and meaningful.
+
+Objects are compared by reference (==), not by content (to be studied later with .equals).
+
+Writing clean, modular code prepares for more advanced OOP concepts (inheritance, polymorphism).

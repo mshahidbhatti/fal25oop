@@ -1,0 +1,30 @@
+== operator → compares references.
+
+equals() → logical equality (content-based).
+
+toString() → readable representation of object.
+
+Demo:
+
+Date d1 = new Date(1,1,2025);
+Date d2 = new Date(1,1,2025);
+System.out.println(d1 == d2);      // false
+System.out.println(d1.equals(d2)); // true (after overriding)
+System.out.println(d1.toString()); // nice output
+
+
+
+copy constructor vs. clone().
+
+Reference Copy: Date d2 = d1; → Both point to the same object.
+
+Shallow Copy: Copy field values only (default assignment).
+
+Deep Copy: Create a new object with copies of inner objects.
+
+Code Demo with Date or BankAccount.
+
+instance variable vs class variables
+
+
+
