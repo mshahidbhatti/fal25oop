@@ -1,0 +1,7 @@
+
+C:\fal25oop\SectionA>javac -d . Classes\Class05\Product.java Classes\Class06\Demo06.java
+
+
+
+java SectionA.Classes.Class06.Demo06
+

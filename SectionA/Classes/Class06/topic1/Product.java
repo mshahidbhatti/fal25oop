@@ -1,13 +1,19 @@
-package SectionA.Classes.Class05;
-
 public class Product{
-
+	//instance variables
 	String id;
 	String name;
 	double price;
-
 	int quantity;
+	//class variables, a variable followed by static
+	static int counter;
 
+	public Product(String name, double price, int quantity){
+		counter++;
+		this.id=String.format("p%03d",counter);
+		this.name=name;
+		this.price=price;
+		this.quantity=quantity;
+	}
 
 	public Product(String id, String name, double price, int quantity){
 		this.id=id;
