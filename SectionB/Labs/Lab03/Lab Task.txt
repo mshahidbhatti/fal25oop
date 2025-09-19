@@ -1,0 +1,11 @@
+Lab 3 – Object-Oriented Programming (Classes, Constructors, Methods)
+
+In this lab, you are required to design and implement a simple Student Management System using the concepts of object-oriented programming. You will create two classes: Student and Date, along with a StudentTest class to test your implementation.
+
+The Student class should have the following attributes: studentId, name, gender, dateOfBirth, and address. The student ID must begin with the prefix "SP25-BCS-" and should include an auto-generated numeric part starting from "001" for the first student and increasing sequentially for each new object created. You are required to implement four constructors in this class: a default constructor, a parameterized constructor with all attributes, a constructor without the ID (where the ID is auto-generated), and a copy constructor. In addition, the class must include getter and setter methods for all attributes, an equals method to compare two student objects, and a toString method that uses String.format to return the student details in a formatted way.
+
+The Date class will represent the date of birth for a student. It should include three attributes: day, month, and year. This class should provide a three-parameter constructor to initialize the date, along with getter and setter methods for each attribute. Additionally, the Date class must override the toString method to return a formatted string representation of the date and implement an equals method to compare two date objects.
+
+Finally, you will create a StudentTest class that contains the main method. In this class, you will create at least three student objects using different constructors. The details of these students should be printed on the console using the toString method. You will also select any two student objects and check them for equality using the equals method, displaying the result of the comparison.
+
+Your submission must include the complete source code of the Student, Date, and StudentTest classes, along with proper comments in the code. The output should demonstrate the formatted student details and the result of the equality check. This lab is designed to help you strengthen your understanding of constructors, encapsulation, object comparison, and output formatting in object-oriented programming.
