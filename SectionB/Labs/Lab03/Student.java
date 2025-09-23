@@ -65,4 +65,13 @@ public class Student {
     public void setAddress(String address) {
         this.address = address;
     }
+
+	public boolen equals(Object o){
+	
+		Student st= (Student)o;
+
+		return this.id.equals(st.getID())&&this.name.equals(o.getName());
+	}
+
+
 }
