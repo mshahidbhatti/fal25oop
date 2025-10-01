@@ -1,23 +1,23 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
 public class CityCinema {
 
 	private final String cityName;
-	private final List<Cinema> cinemas = new ArrayList<>();
+
+	// Backing array + logical size (arrays-only, grow manually)
+	private Cinema[] cinemas;
+	private int cinemaCount;
 
 	// -------------------- Constructors --------------------
 
 	/** Empty city with a name; add cinemas later. */
 	public CityCinema(String cityName) {
-		if (cityName == null || cityName.isBlank()) {
+		if (cityName == null || cityName.trim().isEmpty()) {
 			throw new IllegalArgumentException("City name must not be empty.");
 		}
 		this.cityName = cityName.trim();
+		this.cinemas = new Cinema[4]; // initial capacity
+		this.cinemaCount = 0;
 	}
 
 	/**
@@ -30,8 +30,9 @@ public class CityCinema {
 		if (numCinemas <= 0 || screensPerCinema <= 0) {
 			throw new IllegalArgumentException("numCinemas and screensPerCinema must be positive.");
 		}
+		ensureCapacity(numCinemas);
 		for (int i = 1; i <= numCinemas; i++) {
-			cinemas.add(new Cinema("Cinema-" + i, screensPerCinema));
+			cinemas[cinemaCount++] = new Cinema("Cinema-" + i, screensPerCinema);
 		}
 	}
 
@@ -42,21 +43,25 @@ public class CityCinema {
 	}
 
 	public int getCinemaCount() {
-		return cinemas.size();
+		return cinemaCount;
 	}
 
-	public List<Cinema> getCinemas() {
-		return Collections.unmodifiableList(cinemas);
+	/** Returns a copy of the used portion of the cinemas array. */
+	public Cinema[] getCinemas() {
+		Cinema[] copy = new Cinema[cinemaCount];
+		for (int i = 0; i < cinemaCount; i++) copy[i] = cinemas[i];
+		return copy;
 	}
 
 	// -------------------- Manage cinemas --------------------
 
 	public void addCinema(Cinema cinema) {
-		Objects.requireNonNull(cinema, "cinema must not be null");
+		if (cinema == null) throw new IllegalArgumentException("cinema must not be null");
 		if (findCinemaByName(cinema.getName()) != null) {
 			throw new IllegalArgumentException("Cinema '" + cinema.getName() + "' already exists in " + cityName);
 		}
-		cinemas.add(cinema);
+		ensureCapacity(cinemaCount + 1);
+		cinemas[cinemaCount++] = cinema;
 	}
 
 	/** Convenience factory: add new cinema with default screens. */
@@ -67,16 +72,19 @@ public class CityCinema {
 	}
 
 	public boolean removeCinemaByName(String cinemaName) {
-		Cinema c = findCinemaByName(cinemaName);
-		return c != null && cinemas.remove(c);
+		int idx = indexOfCinema(cinemaName);
+		if (idx == -1) return false;
+		// shift left
+		for (int i = idx; i < cinemaCount - 1; i++) {
+			cinemas[i] = cinemas[i + 1];
+		}
+		cinemas[--cinemaCount] = null; // help GC
+		return true;
 	}
 
 	public Cinema findCinemaByName(String cinemaName) {
-		if (cinemaName == null) return null;
-		for (Cinema c : cinemas) {
-			if (cinemaName.equalsIgnoreCase(c.getName())) return c;
-		}
-		return null;
+		int idx = indexOfCinema(cinemaName);
+		return (idx == -1) ? null : cinemas[idx];
 	}
 
 	// -------------------- Booking / Cancellation --------------------
@@ -98,19 +106,19 @@ public class CityCinema {
 
 	public int getTotalSeatCount() {
 		int total = 0;
-		for (Cinema c : cinemas) total += c.getTotalSeatCount();
+		for (int i = 0; i < cinemaCount; i++) total += cinemas[i].getTotalSeatCount();
 		return total;
 	}
 
 	public int getAvailableSeatCount() {
 		int total = 0;
-		for (Cinema c : cinemas) total += c.getAvailableSeatCount();
+		for (int i = 0; i < cinemaCount; i++) total += cinemas[i].getAvailableSeatCount();
 		return total;
 	}
 
 	public int getAvailableSeatCount(Seat.SeatType type) {
 		int total = 0;
-		for (Cinema c : cinemas) total += c.getAvailableSeatCount(type);
+		for (int i = 0; i < cinemaCount; i++) total += cinemas[i].getAvailableSeatCount(type);
 		return total;
 	}
 
@@ -123,8 +131,11 @@ public class CityCinema {
 	 * or null if none is found.
 	 */
 	public String findFirstAvailablePretty(Seat.SeatType type) {
-		for (Cinema c : cinemas) {
-			for (Screen s : c.getScreens()) {
+		for (int i = 0; i < cinemaCount; i++) {
+			Cinema c = cinemas[i];
+			int screenCount = c.getScreenCount();
+			for (int sIdx = 0; sIdx < screenCount; sIdx++) {
+				Screen s = c.getScreen(sIdx);
 				Seat seat = s.findFirstAvailable(type);
 				if (seat != null) {
 					return String.format("%s > %s > Seat %s (%s, %.2f)",
@@ -136,16 +147,32 @@ public class CityCinema {
 	}
 
 	/**
-	 * List all available seats of a given type for a specific cinema.
-	 * Returns an unmodifiable copy (safe to expose).
+	 * List all available seats of a given type for a specific cinema as a plain array.
+	 * Arrays-only approach: two passes (count, then fill).
 	 */
-	public List<Seat> listAvailable(String cinemaName, Seat.SeatType type) {
+	public Seat[] listAvailable(String cinemaName, Seat.SeatType type) {
 		Cinema c = requireCinema(cinemaName);
-		List<Seat> out = new ArrayList<>();
-		for (Screen s : c.getScreens()) {
-			out.addAll(s.listAvailable(type));
+
+		// 1) Count
+		int total = 0;
+		int screenCount = c.getScreenCount();
+		for (int sIdx = 0; sIdx < screenCount; sIdx++) {
+			Screen s = c.getScreen(sIdx);
+			Seat[] avail = s.listAvailable(type); // Screen returns Seat[]
+			total += avail.length;
 		}
-		return Collections.unmodifiableList(out);
+
+		// 2) Fill
+		Seat[] out = new Seat[total];
+		int k = 0;
+		for (int sIdx = 0; sIdx < screenCount; sIdx++) {
+			Screen s = c.getScreen(sIdx);
+			Seat[] avail = s.listAvailable(type);
+			for (int j = 0; j < avail.length; j++) {
+				out[k++] = avail[j];
+			}
+		}
+		return out;
 	}
 
 	// -------------------- Displays / Reports --------------------
@@ -153,8 +180,8 @@ public class CityCinema {
 	/** Compact layouts for every cinema (delegates down to each screen). */
 	public void displayLayouts() {
 		System.out.println("=== CITY: " + cityName + " | All Cinema Layouts ===");
-		for (Cinema c : cinemas) {
-			c.displayLayout();
+		for (int i = 0; i < cinemaCount; i++) {
+			cinemas[i].displayLayout();
 			System.out.println("=======================================");
 		}
 		System.out.printf("City Totals -> Seats: %d, Available: %d%n",
@@ -165,8 +192,8 @@ public class CityCinema {
 	/** Verbose seat listings for every cinema. */
 	public void displayVerbose() {
 		System.out.println("=== CITY: " + cityName + " | Detailed Seats ===");
-		for (Cinema c : cinemas) {
-			c.displayVerbose();
+		for (int i = 0; i < cinemaCount; i++) {
+			cinemas[i].displayVerbose();
 			System.out.println("=======================================");
 		}
 		System.out.printf("City Totals -> Seats: %d, Available: %d%n",
@@ -177,13 +204,12 @@ public class CityCinema {
 	@Override
 	public String toString() {
 		return String.format("CityCinema{city='%s', cinemas=%d, totalSeats=%d, available=%d}",
-				cityName, getCinemaCount(), getTotalSeatCount(), getAvailableSeatCount());
+				cityName, cinemaCount, getTotalSeatCount(), getAvailableSeatCount());
 	}
 
 	// -------------------- Sample data loader (arrays) --------------------
 	/**
-	 * OPTIONAL: If you need a strict array-based preload (e.g., for a lab requirement),
-	 * this method populates the city with a fixed array of cinemas/screens layout.
+	 * Strict array-based preload for labs that require explicit array initialization.
 	 * Example: 2 cinemas × 3 screens each, with jagged rows {10,11,12,13,14}.
 	 */
 	public void loadSampleDataUsingArrays() {
@@ -191,9 +217,8 @@ public class CityCinema {
 		for (int i = 0; i < preset.length; i++) {
 			preset[i] = new Cinema("Cinema-" + (i + 1), 3); // each cinema preloads 3 screens by default
 		}
-		// Move array elements into our managed list (avoids exposing raw arrays externally)
-		cinemas.clear();
-		Collections.addAll(cinemas, preset);
+		cinemas = preset;        // replace backing array
+		cinemaCount = preset.length;
 	}
 
 	// -------------------- Helpers --------------------
@@ -204,5 +229,23 @@ public class CityCinema {
 			throw new IllegalArgumentException("No cinema named '" + name + "' in city '" + cityName + "'.");
 		}
 		return c;
+	}
+
+	private int indexOfCinema(String cinemaName) {
+		if (cinemaName == null) return -1;
+		for (int i = 0; i < cinemaCount; i++) {
+			Cinema c = cinemas[i];
+			if (c != null && cinemaName.equalsIgnoreCase(c.getName())) return i;
+		}
+		return -1;
+	}
+
+	private void ensureCapacity(int minCapacity) {
+		int oldCap = (cinemas == null) ? 0 : cinemas.length;
+		if (oldCap >= minCapacity) return;
+		int newCap = Math.max(1, Math.max(minCapacity, oldCap * 2));
+		Cinema[] next = new Cinema[newCap];
+		for (int i = 0; i < cinemaCount; i++) next[i] = cinemas[i];
+		cinemas = next;
 	}
 }
