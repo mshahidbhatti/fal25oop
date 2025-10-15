@@ -25,82 +25,49 @@ Goal: From the brief, extract the domain model and lock down entities, attribute
 
 What to do (one page, concise tables/bullets)
 A) Entities & Responsibilities (you choose the names)
-
 Create a table with at least 8 entities covering:
-
 a top-level coordinator (whole city),
-
 a society-level container,
-
 a block-level container,
-
 a plot unit,
-
 a corner plot variant (inherits from the plot unit),
-
 a park amenity,
-
 a commercial area,
-
 a shop unit.
 
 For each entity (you pick the names), include:
-
 Purpose/role (one sentence)
-
 Parent/contained-by (who owns it)
-
 Holds (arrays it owns + logical size counters)
-
 Key behaviors (e.g., book/cancel, find by ID)
-
 Use arrays only for containment and search results. If an entity holds many items, plan a logical size and manual growth (copy into a larger array).
 
 B) Attributes (per entity—name them yourself)
-
 For each entity, list the minimal attributes needed. Ensure the following semantics are covered (use your own attribute names):
-
 Identifiers
-
 Human-friendly ID for the unit representing a plot: format street-plot (e.g., 3-007, with 1-based street index and a 3-digit plot number).
-
 Categorization
-
 An enumeration for plot categories with values:
 RES_5_MARLA, RES_10_MARLA, RES_1_KANAL, COMM_SHOP, COMM_OFFICE, PARKING.
 
 Geometry & Area
-
 A shape type enumeration with values: RECTANGLE, TRAPEZOID, L_SHAPE.
-
 Minimal dimensions per shape to compute area.
-
 A stored/computed area field.
-
 Pricing & Availability
-
 Base price policy (PKR):
 5 Marla = 4,000,000; 10 Marla = 7,500,000; 1 Kanal = 14,000,000;
 COMM_SHOP = 3,000,000; COMM_OFFICE = 5,000,000; PARKING = 200,000.
 
 Corner premium: +8% over base price for the corner-plot variant.
-
 Availability flag; booking and cancellation must mutate this safely.
-
 Amenities (per block)
-
 Parks: 1–2 items, each with shape, dimensions, and area.
-
 Commercial area: one per block; internally holds 12–20 shop units (each with ID, price, availability).
-
 C) Layout & Preload Rules (encode as constants/policies)
-
 City: Lahore with two societies named LDA Avenue 1 and LDA Avenue 2.
-
 Blocks per society: A, B, C.
-
 Streets per block (rows): 5 with jagged lengths 10, 11, 12, 13, 14.
-
 Street → Category mapping:
 1 → RES_5_MARLA (RECTANGLE)
 2 → RES_10_MARLA (RECTANGLE)
@@ -109,23 +76,50 @@ Street → Category mapping:
 5 → COMM_OFFICE (RECTANGLE)
 
 Sprinkle rules:
-
 Every 5th plot on any street → PARKING.
-
 Every 4th plot on streets 1–3 → corner-plot variant (apply the +8% premium).
-
 D) Area Formulas (show once)
-
 RECTANGLE: area = width × depth
-
 TRAPEZOID: area = ((front + back) / 2) × depth
-
 L_SHAPE: area = (w1 × d1) + (w2 × d2)
-
 E) Constraints & Output
-
 Arrays-only (no collections); two-pass filtering for multi-result queries (count → allocate → fill).
-
 Use IDs in street-plot format.
-
 Provide short, readable summaries for units and compact layouts (A/X markers) for streets.
+
+Task 2 — UML Class Diagram (with Associations & Cardinalities)
+Goal: Produce a clean UML diagram that captures structure and relationships.
+Must include (with standard UML notations):
+Classes & Inheritance: CornerPlot ⟶|> Plot
+Composition (filled diamond):
+
+HousingSociety ♦── 1..* Block
+
+Block ♦── 1 CommercialMarket
+
+CommercialMarket ♦── 12..20 Shop
+
+Block ♦── 1..2 Park
+
+Block ♦── 5 streets × (10..14) Plot (show as plots: Plot[][] and annotate "jagged 2-D")
+Aggregation/Association (hollow diamond or plain line):
+
+CityHousing ◇── 2 HousingSociety (LDA Avenue 1, LDA Avenue 2)
+Key attributes (minimal, no methods list needed unless you want):
+
+Include identifiers, type enums, shape enums, area, price, available, arrays + size counters.
+Cardinalities & roles:
+
+Show multiplicities at each end (e.g., 1, 0..1, 1..*, 12..20).
+
+Label associations meaningfully (e.g., "blocks", "shops", "parks").
+Notes/constraints on the diagram:
+
+Arrays-only; manual growth; two-pass filtering
+
+ID format street-plot (e.g., 3-007)
+
+Street→PlotType policy; parking/corner rules; corner premium +8%
+
+Area computed from ShapeType + stored dimensions
+Deliverable: One UML class diagram (image or PDF). If you prefer text, you may submit a PlantUML file that renders the same associations and multiplicities.
