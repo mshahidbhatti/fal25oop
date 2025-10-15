@@ -1,0 +1,131 @@
+Section A — Lab 5 (October 1, 2025)
+
+In this lab you will build, using only Java arrays, a Housing Society Management system for Lahore that models two real-sounding societies—LDA Avenue 1 and LDA Avenue 2—each divided into Blocks named A, B, C, …. Every block is laid out as a set of streets (rows) containing plots (columns), and each block also contains one or two parks plus one commercial market. The aim is to practice encapsulation, enums, inheritance (without abstract classes), jagged two-dimensional arrays, manual array resizing, and the two-pass filtering pattern (count → allocate → fill), while keeping the design readable and grounded in a familiar local scenario.
+
+The core rentable unit is a Plot, identified by a human-friendly ID street-plot such as 3-007. Each plot carries a PlotType from a fixed enumeration tailored to local real estate—RES_5_MARLA, RES_10_MARLA, RES_1_KANAL, COMM_SHOP, COMM_OFFICE, and PARKING—and a list price that is derived automatically from its type so individual price entry is unnecessary (for example: RES_5_MARLA = 4,000,000 PKR; RES_10_MARLA = 7,500,000 PKR; RES_1_KANAL = 14,000,000 PKR; COMM_SHOP = 3,000,000 PKR; COMM_OFFICE = 5,000,000 PKR; PARKING = 200,000 PKR). A plot tracks availability (booked vs available), starts available by default, and changes state only through safe booking and cancellation methods. Its text summary should concisely show ID, type, area, price, and availability so pricing and state are obvious in the output.
+
+To make the system more realistic and to introduce geometric reasoning without heavy math, each plot must also have a shape with dimensions, and its area must be computed from that shape. Use a small shape set such as RECTANGLE (area = width × depth), TRAPEZOID (area = ((front + back) ÷ 2) × depth), and L_SHAPE (area = (w₁ × d₁) + (w₂ × d₂)). Store the minimal dimensions needed per shape ( widths and depth), compute the area in a helper, and keep all values in a simple “square-unit” system so you don’t have to worry about real-world conversions. To demonstrate inheritance without abstract classes, include a concrete CornerPlot as a subclass of Plot that adds a second road frontage (two widths) and applies a corner premium—for example, +8% over the base price. Preload each block with a mix of regular and corner plots so the premium naturally appears in printed results.
+
+A Block ( “Block A”) is backed by a jagged two-dimensional array of plots. Use a default of five streets whose lengths increase as 10, 11, 12, 13, 14 to ensure your code handles jagged rows. Materialize the entire grid at construction time. Assign plot types by street index so validation is easy: Street 1 → RES_5_MARLA (RECTANGLE), Street 2 → RES_10_MARLA (RECTANGLE), Street 3 → RES_1_KANAL (TRAPEZOID to vary shapes), Street 4 → COMM_SHOP (RECTANGLE near the market frontage), Street 5 → COMM_OFFICE (RECTANGLE). Sprinkle variety by marking every fifth plot on any street as PARKING. Within the residential streets (1–3), mark every fourth plot as a CornerPlot and compute area using the dual-frontage logic; the price automatically reflects the corner premium. Each plot’s ID must be synthesized from coordinates (1-based street index and a 3-digit plot number).
+
+Every block must also include amenities separate from the plot grid: create one or two Parks and one Commercial Market. Model parks with a simple shape (usually RECTANGLE) and dimensions so their area can be printed in reports; store them in a Park[] with a logical size. Model the market as a single CommercialMarket object that internally manages a plain Shop[] ( 12–20 shops), each shop being a small rentable unit of type COMM_SHOP with its own ID and price. These amenities are not part of the plot grid and should not inflate residential/commercial plot counts; they are listed under the block’s amenity section in reports.
+
+A HousingSociety (here: LDA Avenue 1 and LDA Avenue 2) aggregates a plain array of blocks plus a logical size counter. Support construction that preloads a fixed number of default blocks (A, B, C) and allows adding a block with custom street lengths. When you run out of capacity, grow the array manually by allocating a larger one and copying references. The society should locate a block by name or index; forward booking and cancellation to a specific block and plot ID; compute totals and availability overall and by PlotType; and print clear, layered reports: first the block summary (name, total plots, available), then a compact street layout (IDs with A/X availability), then a detailed list of plots, followed by an amenities section enumerating parks (with areas) and the market (number of shops, any vacant shops).
+
+At the top level, a CityHousing object coordinates both societies within Lahore, again using arrays and a logical size with manual growth. Provide methods to add or remove societies, find a society by name, relay booking/cancellation down to the correct society, block, and plot, and compute city-wide aggregates. Include a small discovery helper that scans Lahore for the first available RES_1_KANAL CornerPlot and returns a friendly description such as “LDA Avenue 2 > Block B > Plot 3-007 (RES_1_KANAL CORNER, area 1,650 su, 15,120,000 PKR).” Also include society-level helpers such as “first available COMM_SHOP facing the market block” (meaning Street 4 in any block) and “largest available residential plot by area” to showcase shape-based area comparisons.
+
+For demonstration, preload Lahore with LDA Avenue 1 and LDA Avenue 2, each having Blocks A, B, and C. In each block, materialize the five-street jagged plot grid with the type-by-street policy, assign shapes and dimensions so area calculations are straightforward, and insert one or two Parks plus one Commercial Market with a fixed number of shops. Print compact layouts for each society and block, then simulate a typical workflow: book plot 3-007 in LDA Avenue 1, Block A; attempt to book the same plot again to show proper rejection; cancel the booking; and print the affected street layout to confirm the state change. Add two quick searches: print the first available RES_1_KANAL CornerPlot in LDA Avenue 2, and list the first three vacant shops in the Block C market of LDA Avenue 1.
+
+Throughout the lab, use only arrays—no Java collections. All multi-result queries return plain arrays constructed with the two-pass technique. When containers need more capacity, allocate a larger array and copy the elements. Your submission should include at least the following classes, named to reflect the structure you built: Plot, CornerPlot, Park, CommercialMarket (with internal Shop[]), Block, HousingSociety, CityHousing, plus two tiny demos (PlotDemo for unit-level behavior and SocietyDemo or CityDemo for the end-to-end flow). Marks will emphasize arrays-only modeling with manual growth, correct enum-driven pricing and corner premium, faithful jagged-grid construction and ID policy, shape-based area computation with clear printed values, clean two-pass filtering, separated amenity handling (parks and market) per block, and complete, policy-driven preload for LDA Avenue 1 and LDA Avenue 2 that supports booking, cancellation, search, and summary workflows.
+
+
+Task 1 — One-Page Requirements Analysis (Identify Entities & Attributes)
+
+Goal: From the brief, extract the domain model and lock down entities, attributes, policies, and constraints—on one page.
+
+What to do (one page, concise tables/bullets)
+A) Entities & Responsibilities (you choose the names)
+
+Create a table with at least 8 entities covering:
+
+a top-level coordinator (whole city),
+
+a society-level container,
+
+a block-level container,
+
+a plot unit,
+
+a corner plot variant (inherits from the plot unit),
+
+a park amenity,
+
+a commercial area,
+
+a shop unit.
+
+For each entity (you pick the names), include:
+
+Purpose/role (one sentence)
+
+Parent/contained-by (who owns it)
+
+Holds (arrays it owns + logical size counters)
+
+Key behaviors (e.g., book/cancel, find by ID)
+
+Use arrays only for containment and search results. If an entity holds many items, plan a logical size and manual growth (copy into a larger array).
+
+B) Attributes (per entity—name them yourself)
+
+For each entity, list the minimal attributes needed. Ensure the following semantics are covered (use your own attribute names):
+
+Identifiers
+
+Human-friendly ID for the unit representing a plot: format street-plot (e.g., 3-007, with 1-based street index and a 3-digit plot number).
+
+Categorization
+
+An enumeration for plot categories with values:
+RES_5_MARLA, RES_10_MARLA, RES_1_KANAL, COMM_SHOP, COMM_OFFICE, PARKING.
+
+Geometry & Area
+
+A shape type enumeration with values: RECTANGLE, TRAPEZOID, L_SHAPE.
+
+Minimal dimensions per shape to compute area.
+
+A stored/computed area field.
+
+Pricing & Availability
+
+Base price policy (PKR):
+5 Marla = 4,000,000; 10 Marla = 7,500,000; 1 Kanal = 14,000,000;
+COMM_SHOP = 3,000,000; COMM_OFFICE = 5,000,000; PARKING = 200,000.
+
+Corner premium: +8% over base price for the corner-plot variant.
+
+Availability flag; booking and cancellation must mutate this safely.
+
+Amenities (per block)
+
+Parks: 1–2 items, each with shape, dimensions, and area.
+
+Commercial area: one per block; internally holds 12–20 shop units (each with ID, price, availability).
+
+C) Layout & Preload Rules (encode as constants/policies)
+
+City: Lahore with two societies named LDA Avenue 1 and LDA Avenue 2.
+
+Blocks per society: A, B, C.
+
+Streets per block (rows): 5 with jagged lengths 10, 11, 12, 13, 14.
+
+Street → Category mapping:
+1 → RES_5_MARLA (RECTANGLE)
+2 → RES_10_MARLA (RECTANGLE)
+3 → RES_1_KANAL (TRAPEZOID)
+4 → COMM_SHOP (RECTANGLE)
+5 → COMM_OFFICE (RECTANGLE)
+
+Sprinkle rules:
+
+Every 5th plot on any street → PARKING.
+
+Every 4th plot on streets 1–3 → corner-plot variant (apply the +8% premium).
+
+D) Area Formulas (show once)
+
+RECTANGLE: area = width × depth
+
+TRAPEZOID: area = ((front + back) / 2) × depth
+
+L_SHAPE: area = (w1 × d1) + (w2 × d2)
+
+E) Constraints & Output
+
+Arrays-only (no collections); two-pass filtering for multi-result queries (count → allocate → fill).
+
+Use IDs in street-plot format.
+
+Provide short, readable summaries for units and compact layouts (A/X markers) for streets.
