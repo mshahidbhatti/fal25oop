@@ -122,4 +122,4 @@ ID format street-plot (e.g., 3-007)
 Street→PlotType policy; parking/corner rules; corner premium +8%
 
 Area computed from ShapeType + stored dimensions
-Deliverable: One UML class diagram (image or PDF). If you prefer text, you may submit a PlantUML file that renders the same associations and multiplicities.
+Deliverable: One UML class diagram (image or PDF). 
