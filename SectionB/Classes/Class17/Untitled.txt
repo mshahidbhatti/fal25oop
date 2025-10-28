@@ -1,0 +1,19 @@
+
+try{
+	risky+dependent
+}
+catch(){
+
+}
+finally{
+
+}
+
+
+throw new Exception();
+
+
+//declaration 
+[method signature] throws IOException{
+
+}

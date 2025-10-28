@@ -1,0 +1,18 @@
+
+try{
+	Risky
+	dependent
+}
+catch(InputMismatchException e){
+
+	//recovery mechanism
+}
+finally{
+
+	// cleanup 
+}
+
+
+throws declaration
+throw  new Exception();
+
